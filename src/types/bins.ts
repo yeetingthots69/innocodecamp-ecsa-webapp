@@ -4,4 +4,5 @@ export type Bin = {
     level?: number;
     height: number;
     lastUpdated?: string;
+    trashType?: string;
 }

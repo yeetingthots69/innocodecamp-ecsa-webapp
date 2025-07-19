@@ -1,4 +1,4 @@
-// src/bluetooth-server.ts
+// root: bluetooth-server.ts
 import express from 'express';
 import { SerialPort } from 'serialport';
 import cors from 'cors';
@@ -29,7 +29,10 @@ const port = new SerialPort({
 port.on('data', (data: Buffer) => {
     // Read the bins from the JSON file only once
     const bins: Bin[] = JSON.parse(fs.readFileSync(binsFilePath, "utf8"));
-    const str = data.toString().trim(); // e.g. "bin_id=bin1;level=72"
+    // Read data, convention as follows:
+    // "r;bin_id=bin1;level=72;lid_closed=true" - indicates bin data
+    // "i;bin_id=bin1;height=100;width=50" - indicates bin metadata;
+    const str = data.toString().trim(); // e.g. "bin_id=bin1;level=72;lid_closed=true"
     const parts = str.split(';');
     // Parse the data into key-value pairs
     const result: Record<string, string> = {};
