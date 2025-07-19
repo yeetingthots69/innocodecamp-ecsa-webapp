@@ -5,6 +5,8 @@ import { ReadlineParser } from '@serialport/parser-readline';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
+import { exec } from 'child_process'
+import { setTimeout } from "timers/promises";
 
 type Bin = {
     id: string;
@@ -22,6 +24,8 @@ const binsFilePath = path.join(process.cwd(), 'src', 'data', 'bins.json');
 
 // Cache data to avoid frequent file reads
 const latestData: Record<string, Bin> = {};
+
+let lastOpen: boolean = false;
 
 const port = new SerialPort({
     path: 'COM4',
@@ -49,6 +53,13 @@ parser.on('data', (line: string) => {
         // Check if the result contains bin_id and level
         if (result.bin_id && result.level) {
             const bin = bins.find(bin => bin.id === result.bin_id);
+
+            if (lastOpen == true && result["lid_closed"] === "true") {
+                getPhoto();
+            }
+
+            lastOpen = result["lid_closed"] === "false";
+
             // If the bin exists, update the latestData cache
             if (bin) {
                 latestData[result.bin_id] = {
@@ -80,6 +91,42 @@ parser.on('data', (line: string) => {
         }
     }
 });
+
+async function getPhoto() {
+    const screenStatus : string | null = runCommand("adb shell dumpsys power | grep 'Display Power'");
+
+    if (!screenStatus) return;
+
+    if (screenStatus.includes("state=OFF") || screenStatus.includes("Display Power: state=OFF")) {
+        runCommand("adb shell input keyevent KEYCODE_WAKEUP");
+    }
+
+    runCommand("adb shell rm /storage/emulated/0/DCIM/Camera/*");
+
+    await setTimeout(3000);
+    runCommand("adb shell am start -a android.media.action.STILL_IMAGE_CAMERA");
+    await setTimeout(3000);
+    runCommand("adb shell input keyevent CAMERA");
+    await setTimeout(3000);
+    
+    runCommand("adb pull /storage/emulated/0/DCIM/Camera");
+
+    runCommand("adb shell input keyevent KEYCODE_POWER");
+}
+
+function runCommand(command: string) : string | null {
+    exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+    }
+    if (stderr) {
+      console.error(`stderr: ${stderr}`);
+    }
+        return stdout;
+    });
+
+    return null;
+}
 
 app.get('/bins', (req, res) => {
     // Always read bins.json to get latest metadata
