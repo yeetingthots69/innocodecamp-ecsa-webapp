@@ -21,7 +21,7 @@ export default function DashboardPage() {
         };
 
         fetchData();
-        const dataInterval = setInterval(fetchData, 5000);
+        const dataInterval = setInterval(fetchData, 1000);
         return () => clearInterval(dataInterval);
     }, []);
 

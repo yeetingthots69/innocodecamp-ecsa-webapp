@@ -45,7 +45,7 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
     const { id } = await request.json();
     const file = await readFile(binFilePath, "utf8");
-    let bins: Bin[] = JSON.parse(file);
+    const bins: Bin[] = JSON.parse(file);
 
     const index = bins.findIndex(bin => bin.id === id);
     if (index === -1) {
