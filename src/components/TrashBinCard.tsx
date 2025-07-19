@@ -5,7 +5,7 @@ import Image from "next/image";
 
 export default function TrashBinCard({ bin }: { bin: Bin }) {
     let statusColor = "text-green-600";
-    const binLevel = bin.level || 0;
+    const binLevel = bin.level ? bin.level : 0;
     const binLevelLastUpdated = bin.lastUpdated ? new Date(bin.lastUpdated).toLocaleString() : "Not updated";
     if (binLevel >= 80) statusColor = "text-red-600";
     else if (binLevel >= 50) statusColor = "text-yellow-600";
