@@ -3,6 +3,7 @@ export type Bin = {
     name: string;
     level?: number;
     height: number;
+    width: number;
     lastUpdated?: string;
     trashType?: string;
 }

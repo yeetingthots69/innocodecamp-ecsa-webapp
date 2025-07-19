@@ -11,7 +11,7 @@ import { Bin } from '@/types/bins';
 export default function AdminPage() {
     const router = useRouter();
     const [bins, setBins] = useState<Bin[]>([]);
-    const [form, setForm] = useState({ id: '', name: '', height: '' });
+    const [form, setForm] = useState({ id: '', name: '', height: '', width: '' });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [editBinId, setEditBinId] = useState<string | null>(null);
@@ -38,14 +38,14 @@ export default function AdminPage() {
     };
 
     const handleEdit = (bin: Bin) => {
-        setForm({ id: bin.id, name: bin.name, height: String(bin.height) });
+        setForm({ id: bin.id, name: bin.name, height: String(bin.height), width: String(bin.width) });
         setEditBinId(bin.id);
         setError('');
         setSuccess('');
     }
 
     const handleCancelEdit = () => {
-        setForm({ id: '', name: '', height: '' });
+        setForm({ id: '', name: '', height: '', width: '' });
         setEditBinId(null);
         setError('');
         setSuccess('');
@@ -69,7 +69,7 @@ export default function AdminPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!form.id || !form.name || !form.height) {
+        if (!form.id || !form.name || !form.height || !form.width) {
             setError('All fields are required');
             return;
         }
@@ -100,7 +100,8 @@ export default function AdminPage() {
                 body: JSON.stringify({
                     id: form.id,
                     name: form.name,
-                    height: Number(form.height)
+                    height: Number(form.height),
+                    width: Number(form.width)
                 })
             });
             const data = await res.json();
@@ -110,7 +111,7 @@ export default function AdminPage() {
             }
             setSuccess(data.message);
         }
-        setForm({ id: '', name: '', height: '' });
+        setForm({ id: '', name: '', height: '', width: '' });
         fetchBins();
     };
 
@@ -158,6 +159,18 @@ export default function AdminPage() {
                                 type="number"
                                 min={1}
                                 value={form.height}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor="width">Bin Width (cm)</Label>
+                            <Input
+                                id="width"
+                                name="width"
+                                type="number"
+                                min={1}
+                                value={form.width}
                                 onChange={handleChange}
                                 required
                             />
