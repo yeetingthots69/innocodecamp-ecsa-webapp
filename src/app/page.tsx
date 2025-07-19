@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import TrashBinCard from '@/components/TrashBinCard';
 import LatestClassification from '@/components/LatestClassification';
 import RecentActivity from '@/components/RecentActivity';
+import DailySummary from '@/components/DailySummary';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bin } from '@/types/bins';
 import { TrashData } from '@/types/trash';
@@ -127,6 +128,11 @@ export default function DashboardPage() {
             <div className="grid gap-6 mb-8 lg:grid-cols-2">
                 <LatestClassification latestTrash={latestTrash} isLoading={isLoading} />
                 <RecentActivity trashHistory={trashHistory} />
+            </div>
+
+            {/* Daily Summary Panel */}
+            <div className="mb-8">
+                <DailySummary trashHistory={trashHistory} />
             </div>
 
             <Card className="mb-8 shadow-md">
