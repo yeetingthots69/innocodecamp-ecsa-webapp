@@ -10,6 +10,7 @@ type Bin = {
     id: string;
     name: string;
     height: number;
+    width: number;
     level?: number;
     lastUpdated?: string; // Locale date string
 }
@@ -27,7 +28,7 @@ const port = new SerialPort({
     baudRate: 9600
 });
 
-const parser = port.pipe(new ReadlineParser({delimiter: '\n'}));
+const parser = port.pipe(new ReadlineParser({ delimiter: '\n' }));
 
 parser.on('data', (line: string) => {
     const str = line.trim();
@@ -59,6 +60,23 @@ parser.on('data', (line: string) => {
                 delete latestData[result.bin_id];
             }
             console.log(latestData);
+        }
+    } else if (parts[0] === 'i') {
+        const result: Record<string, string> = {};
+        parts.forEach((part: string) => {
+            const [key, value] = part.split('=');
+            if (key && value) result[key] = value;
+        });
+        if (result.bin_id && result.height && result.width) {
+            const bins: Bin[] = JSON.parse(fs.readFileSync(binsFilePath, "utf8"));
+            const binIndex = bins.findIndex(bin => bin.id === result.bin_id);
+            if (binIndex !== -1) {
+                bins[binIndex].height = parseInt(result.height, 10);
+                bins[binIndex].width = parseInt(result.width, 10);
+            } else {
+                console.log("UNIDENTIFIED BIN, ID: " + result.bin_id);
+            }
+            fs.writeFileSync(binsFilePath, JSON.stringify(bins, null, 2), "utf8");
         }
     }
 });
