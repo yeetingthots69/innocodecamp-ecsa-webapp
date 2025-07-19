@@ -1,6 +1,8 @@
-// TypeScript interfaces for Hugging Face Garbage Classification API
-
-import { error } from "console";
+import { TrashData } from "@/types/trash";
+import path from "path";
+import { existsSync } from "fs";
+import { mkdir, readFile, writeFile } from "fs/promises"
+import { timeStamp } from "console";
 
 // Input data interface
 interface HuggingFaceInput {
@@ -21,6 +23,7 @@ interface HuggingFaceError {
     error: string;
     estimated_time?: number;
 }
+
 
 // Complete response type (success or error)
 type APIResponse = HuggingFaceResponse | HuggingFaceError;
@@ -170,6 +173,39 @@ function getRecyclingInfo(category: string): { canRecycle: boolean; instructions
     };
 }
 
+async function saveTrashData(trashData: TrashData): Promise<void> {
+    try {
+        const dataDir = path.join(process.cwd(), 'src', 'data');
+        const filePath = path.join(dataDir, 'trash.json');
+
+        if (!existsSync(dataDir)) {
+            await mkdir(dataDir, { recursive: true })
+        }
+
+        let existingData: TrashData[] = [];
+
+        if (existsSync(filePath)) {
+            try {
+                const fileContent = await readFile(filePath, "utf-8");
+                existingData = JSON.parse(fileContent);
+            } catch (error) {
+                console.error('error reading existing trash file');
+                existingData = [];
+            }
+        }
+        existingData.push(trashData);
+
+        if (existingData.length > 100) {
+            existingData = existingData.slice(-100)
+        }
+        await writeFile(filePath, JSON.stringify(existingData, null, 2));
+        console.log("trash save success");
+    } catch (error) {
+        console.error('error saving trash data:', error);
+        throw error;
+    }
+}
+
 export async function POST(request: Request) {
     try {
         const formData = await request.formData();
@@ -190,22 +226,67 @@ export async function POST(request: Request) {
         }
 
         const results = await classifyGarbage(file);
-
         const topResult = results[0];
         const recyclingInfo = getRecyclingInfo(topResult.label);
+
+        const trashData: TrashData = {
+            category: topResult.label,
+            timestamp: new Date().toISOString(),
+            confidence: topResult.score,
+            recyclingInfo: recyclingInfo,
+        }
+
+        try {
+            await saveTrashData(trashData);
+        } catch (saveError) {
+            console.error(`error saving trash data but success classify: ${saveError}`);
+        }
+
         return Response.json({
             success: true,
             data: {
                 category: topResult.label,
                 confidence: topResult.score,
                 allResult: results,
-                recyclingInfo: recyclingInfo
+                recyclingInfo: recyclingInfo,
+                saveToFile: true,
+                timestamp: trashData.timestamp
             }
         });
     } catch (error) {
         console.error('API error: ', error);
         return Response.json(
             { error: 'failed to classified image' },
+            { status: 500 }
+        );
+    }
+}
+
+// Add GET method to retrieve saved trash data
+export async function GET() {
+    try {
+        const dataDir = path.join(process.cwd(), 'src', 'data');
+        const filePath = path.join(dataDir, 'trash.json');
+
+        // Check if file exists
+        if (!existsSync(filePath)) {
+            return Response.json([]);
+        }
+
+        // Read the file
+        const fileContent = await readFile(filePath, 'utf-8');
+        const data = JSON.parse(fileContent);
+
+        return Response.json({
+            success: true,
+            data: data,
+            total: data.length
+        });
+
+    } catch (error) {
+        console.error('Error reading trash data:', error);
+        return Response.json(
+            { error: 'Failed to read trash data' },
             { status: 500 }
         );
     }
