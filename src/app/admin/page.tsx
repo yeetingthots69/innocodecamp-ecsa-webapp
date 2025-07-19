@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import {Bin} from '@/types/bins';
+import { Bin } from '@/types/bins';
 
 export default function AdminPage() {
     const router = useRouter();

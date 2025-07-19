@@ -1,12 +1,12 @@
-import {NextRequest, NextResponse} from 'next/server';
-import {Bin} from '@/types/bins';
+import { NextRequest, NextResponse } from 'next/server';
+import { Bin } from '@/types/bins';
 import path from 'path';
-import {readFile, writeFile} from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 
 const binFilePath = path.join(process.cwd(), 'src', 'data', 'bins.json');
 
 export async function GET() {
-    const response = await fetch('http://localhost:3001/bins');
+    const response = await fetch('http://localhost:3000/bins');
     const data = await response.json();
     return NextResponse.json(data);
 }
