@@ -28,5 +28,5 @@ app.post('/upload', upload.single('image'), (req, res) => {
 
 const serverPort = 3002;
 app.listen(serverPort, () => {
-    console.log(`Android server running at http://localhost:${serverPort}`);
+    console.log(`Android server running at http://localhost:${serverPort}, and http://192.168.206.149:${serverPort}`);
 });

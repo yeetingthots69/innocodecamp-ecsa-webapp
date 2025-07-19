@@ -1,12 +1,12 @@
 // root: bluetooth-server.ts
 import express from 'express';
-import { SerialPort } from 'serialport';
-import { ReadlineParser } from '@serialport/parser-readline';
+import {SerialPort} from 'serialport';
+import {ReadlineParser} from '@serialport/parser-readline';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
-import { exec } from 'child_process'
-import { setTimeout } from "timers/promises";
+import {execSync} from 'child_process'
+import {setTimeout} from "timers/promises";
 
 type Bin = {
     id: string;
@@ -32,7 +32,7 @@ const port = new SerialPort({
     baudRate: 9600
 });
 
-const parser = port.pipe(new ReadlineParser({ delimiter: '\n' }));
+const parser = port.pipe(new ReadlineParser({delimiter: '\n'}));
 
 parser.on('data', (line: string) => {
     const str = line.trim();
@@ -93,12 +93,24 @@ parser.on('data', (line: string) => {
 });
 
 async function getPhoto() {
-    const screenStatus : string | null = runCommand("adb shell dumpsys power | grep 'Display Power'");
+    const screenStatus: string | null = runCommand("adb shell dumpsys power | findstr mHoldingDisplaySuspendBlocker");
 
-    if (!screenStatus) return;
+    console.log(screenStatus);
 
-    if (screenStatus.includes("state=OFF") || screenStatus.includes("Display Power: state=OFF")) {
+    if (!screenStatus) {
+        console.log("returning");
+        return;
+    }
+
+    if (screenStatus.includes("false")) {
         runCommand("adb shell input keyevent KEYCODE_WAKEUP");
+        // runCommand("adb shell input swipe 500 1800 500 1300 100");
+    }
+
+    const lockStatus: string | null = runCommand("adb shell dumpsys window | findstr mDreamingLockscreen");
+
+    if (lockStatus?.includes("mDreamingLockscreen=true")) {
+        runCommand("adb shell input swipe 500 1800 500 1300 100");
     }
 
     runCommand("adb shell rm /storage/emulated/0/DCIM/Camera/*");
@@ -108,24 +120,20 @@ async function getPhoto() {
     await setTimeout(3000);
     runCommand("adb shell input keyevent CAMERA");
     await setTimeout(3000);
-    
+
     runCommand("adb pull /storage/emulated/0/DCIM/Camera");
 
     runCommand("adb shell input keyevent KEYCODE_POWER");
 }
 
-function runCommand(command: string) : string | null {
-    exec(command, (error, stdout, stderr) => {
-    if (error) {
-      console.error(`exec error: ${error}`);
+function runCommand(command: string): string | null {
+    try {
+        const output = execSync(command).toString().trim();
+        return output;
+    } catch (error) {
+        console.error(`execSync error: ${error}`);
+        return null;
     }
-    if (stderr) {
-      console.error(`stderr: ${stderr}`);
-    }
-        return stdout;
-    });
-
-    return null;
 }
 
 app.get('/bins', (req, res) => {
@@ -145,4 +153,5 @@ app.get('/bins', (req, res) => {
 const serverPort = 3001;
 app.listen(serverPort, () => {
     console.log(`Bluetooth bridge server running at http://localhost:${serverPort}`);
+    // getPhoto();
 });
