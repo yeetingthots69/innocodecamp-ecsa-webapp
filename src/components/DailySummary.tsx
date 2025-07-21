@@ -99,7 +99,7 @@ export default function DailySummary({ trashHistory }: DailySummaryProps) {
         <Card className="shadow-lg">
             <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-xl">
-                    📊 Today's Summary
+                    📊 Today&#39;s Summary
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">

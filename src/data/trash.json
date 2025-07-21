@@ -7,5 +7,149 @@
       "canRecycle": true,
       "instructions": "Keep dry and place in paper recycling bin"
     }
+  },
+  {
+    "category": "cardboard",
+    "timestamp": "2025-07-19T08:08:44.274Z",
+    "confidence": 0.969548225402832,
+    "recyclingInfo": {
+      "canRecycle": true,
+      "instructions": "Remove tape and flatten before placing in recycling bin"
+    }
+  },
+  {
+    "category": "metal",
+    "timestamp": "2025-07-19T08:10:07.450Z",
+    "confidence": 0.22835183143615723,
+    "recyclingInfo": {
+      "canRecycle": true,
+      "instructions": "Rinse clean and place in metal recycling bin"
+    }
+  },
+  {
+    "category": "cardboard",
+    "timestamp": "2025-07-19T08:16:22.182Z",
+    "confidence": 0.9463039636611938,
+    "recyclingInfo": {
+      "canRecycle": true,
+      "instructions": "Remove tape and flatten before placing in recycling bin"
+    }
+  },
+  {
+    "category": "metal",
+    "timestamp": "2025-07-19T08:21:42.298Z",
+    "confidence": 0.22376567125320435,
+    "recyclingInfo": {
+      "canRecycle": true,
+      "instructions": "Rinse clean and place in metal recycling bin"
+    }
+  },
+  {
+    "category": "metal",
+    "timestamp": "2025-07-19T08:38:46.786Z",
+    "confidence": 0.23097091913223267,
+    "recyclingInfo": {
+      "canRecycle": true,
+      "instructions": "Rinse clean and place in metal recycling bin"
+    }
+  },
+  {
+    "category": "cardboard",
+    "timestamp": "2025-07-19T08:44:59.391Z",
+    "confidence": 0.9556670188903809,
+    "recyclingInfo": {
+      "canRecycle": true,
+      "instructions": "Remove tape and flatten before placing in recycling bin"
+    }
+  },
+  {
+    "category": "cardboard",
+    "timestamp": "2025-07-19T08:46:46.925Z",
+    "confidence": 0.9723997712135315,
+    "recyclingInfo": {
+      "canRecycle": true,
+      "instructions": "Remove tape and flatten before placing in recycling bin"
+    }
+  },
+  {
+    "category": "cardboard",
+    "timestamp": "2025-07-19T08:48:01.787Z",
+    "confidence": 0.263731449842453,
+    "recyclingInfo": {
+      "canRecycle": true,
+      "instructions": "Remove tape and flatten before placing in recycling bin"
+    }
+  },
+  {
+    "category": "cardboard",
+    "timestamp": "2025-07-19T08:49:34.910Z",
+    "confidence": 0.9628154039382935,
+    "recyclingInfo": {
+      "canRecycle": true,
+      "instructions": "Remove tape and flatten before placing in recycling bin"
+    }
+  },
+  {
+    "category": "cardboard",
+    "timestamp": "2025-07-19T08:50:31.968Z",
+    "confidence": 0.9717739224433899,
+    "recyclingInfo": {
+      "canRecycle": true,
+      "instructions": "Remove tape and flatten before placing in recycling bin"
+    }
+  },
+  {
+    "category": "cardboard",
+    "timestamp": "2025-07-19T08:52:29.440Z",
+    "confidence": 0.9707174301147461,
+    "recyclingInfo": {
+      "canRecycle": true,
+      "instructions": "Remove tape and flatten before placing in recycling bin"
+    }
+  },
+  {
+    "category": "cardboard",
+    "timestamp": "2025-07-19T08:53:09.404Z",
+    "confidence": 0.9707174301147461,
+    "recyclingInfo": {
+      "canRecycle": true,
+      "instructions": "Remove tape and flatten before placing in recycling bin"
+    }
+  },
+  {
+    "category": "cardboard",
+    "timestamp": "2025-07-19T08:53:45.179Z",
+    "confidence": 0.9763617515563965,
+    "recyclingInfo": {
+      "canRecycle": true,
+      "instructions": "Remove tape and flatten before placing in recycling bin"
+    }
+  },
+  {
+    "category": "cardboard",
+    "timestamp": "2025-07-19T08:55:07.248Z",
+    "confidence": 0.9169315695762634,
+    "recyclingInfo": {
+      "canRecycle": true,
+      "instructions": "Remove tape and flatten before placing in recycling bin"
+    }
+  },
+  {
+    "category": "metal",
+    "timestamp": "2025-07-19T08:56:06.507Z",
+    "confidence": 0.23568759858608246,
+    "recyclingInfo": {
+      "canRecycle": true,
+      "instructions": "Rinse clean and place in metal recycling bin"
+    }
+  },
+  {
+    "category": "cardboard",
+    "timestamp": "2025-07-19T08:57:22.638Z",
+    "confidence": 0.9730522036552429,
+    "recyclingInfo": {
+      "canRecycle": true,
+      "instructions": "Remove tape and flatten before placing in recycling bin"
+    }
   }
 ]

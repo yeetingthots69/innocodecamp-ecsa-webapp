@@ -10,7 +10,7 @@ export default function TrashBinCard({ bin }: { bin: Bin }) {
     if (binLevel >= 80) statusColor = "text-red-600";
     else if (binLevel >= 50) statusColor = "text-yellow-600";
 
-    // Image path (change '/uploads/' to your actual image folder if needed)
+    // Image path
     const imageSrc = `/${bin.id}.jpg`;
     const fallbackSrc = "/bin-placeholder.jpg"; // Place a placeholder image in public/images
 
@@ -28,10 +28,6 @@ export default function TrashBinCard({ bin }: { bin: Bin }) {
                             width={80}
                             height={80}
                             className="rounded shadow"
-                            onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.src = fallbackSrc;
-                            }}
                         />
                     </div>
                     <div className="flex flex-col flex-grow space-y-2">
@@ -41,9 +37,6 @@ export default function TrashBinCard({ bin }: { bin: Bin }) {
                         </p>
                         <p className="text-xs text-muted-foreground">
                             Last updated: {binLevelLastUpdated}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                            Latest trash type: {bin.trashType || "Unknown"}
                         </p>
                     </div>
                 </div>

@@ -7,6 +7,8 @@ import fs from 'fs';
 import path from 'path';
 import {execSync} from 'child_process'
 import {setTimeout} from "timers/promises";
+import fetch from 'node-fetch';
+import {readdir} from 'fs/promises';
 
 type Bin = {
     id: string;
@@ -17,6 +19,16 @@ type Bin = {
     lastUpdated?: string; // Locale date string
 }
 
+type TrashData = {
+    timestamp: string;
+    category: string;
+    confidence: number;
+    recyclingInfo: {
+        canRecycle: boolean;
+        instructions: string;
+    }
+}
+
 const app = express();
 app.use(cors());
 
@@ -24,6 +36,7 @@ const binsFilePath = path.join(process.cwd(), 'src', 'data', 'bins.json');
 
 // Cache data to avoid frequent file reads
 const latestData: Record<string, Bin> = {};
+const latestTrash: Record<string, TrashData> = {};
 
 let lastOpen: boolean = false;
 
@@ -53,11 +66,9 @@ parser.on('data', (line: string) => {
         // Check if the result contains bin_id and level
         if (result.bin_id && result.level) {
             const bin = bins.find(bin => bin.id === result.bin_id);
-
-            if (lastOpen == true && result["lid_closed"] === "true") {
-                getPhoto();
+            if (lastOpen && result["lid_closed"] === "true") {
+                getPhoto(bin!.id);
             }
-
             lastOpen = result["lid_closed"] === "false";
 
             // If the bin exists, update the latestData cache
@@ -92,7 +103,7 @@ parser.on('data', (line: string) => {
     }
 });
 
-async function getPhoto() {
+async function getPhoto(id: string) {
     const screenStatus: string | null = runCommand("adb shell dumpsys power | findstr mHoldingDisplaySuspendBlocker");
 
     console.log(screenStatus);
@@ -124,6 +135,38 @@ async function getPhoto() {
     runCommand("adb pull /storage/emulated/0/DCIM/Camera");
 
     runCommand("adb shell input keyevent KEYCODE_POWER");
+
+    // Wait for file to be pulled
+    await setTimeout(2000);
+    // Find newest image in Camera folder
+    const cameraDir = path.join(process.cwd(), 'Camera');
+    const files = await readdir(cameraDir);
+    const imageFiles = files.filter(f => f.endsWith('.jpg') || f.endsWith('.jpeg') || f.endsWith('.png'));
+    if (imageFiles.length === 0) {
+        console.log("No image found in Camera folder");
+        return;
+    }
+    imageFiles.sort();
+    const newestFilename = imageFiles[imageFiles.length - 1];
+
+    // Send POST request to /api/trash
+    try {
+        const response = await fetch('http://localhost:3000/api/trash', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({filename: newestFilename})
+        });
+        // const result: TrashData = await response.json() as TrashData;
+        //
+        // try {
+        //     latestTrash[id] = result;
+        // } catch (saveError) {
+        //     console.error(`error saving trash data but success classify: ${saveError}`);
+        // }
+        // console.log("Trash classification result:", result);
+    } catch (err) {
+        console.error("Error sending image to /api/trash:", err);
+    }
 }
 
 function runCommand(command: string): string | null {

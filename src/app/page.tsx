@@ -1,15 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+import {useEffect, useState} from 'react';
+import {useRouter} from 'next/navigation';
+import {Button} from '@/components/ui/button';
 import TrashBinCard from '@/components/TrashBinCard';
 import LatestClassification from '@/components/LatestClassification';
-import RecentActivity from '@/components/RecentActivity';
 import DailySummary from '@/components/DailySummary';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bin } from '@/types/bins';
-import { TrashData } from '@/types/trash';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import {Bin} from '@/types/bins';
+import {TrashData} from '@/types/trash';
 
 export default function DashboardPage() {
     const [bins, setBins] = useState<Bin[]>([]);
@@ -71,7 +70,7 @@ export default function DashboardPage() {
                 }
                 const result = await res.json();
 
-                if (result.success && result.data.length > 0) {
+                if (result.data.length > 0) {
                     // Get the latest trash entry
                     const sortedData = result.data.sort((a: TrashData, b: TrashData) =>
                         new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
@@ -125,16 +124,11 @@ export default function DashboardPage() {
             </div>
 
             {/* Live Trash Feed Panel */}
-            <div className="grid gap-6 mb-8 lg:grid-cols-2">
-                <LatestClassification latestTrash={latestTrash} isLoading={isLoading} />
-                <RecentActivity trashHistory={trashHistory} />
-            </div>
-
+            <LatestClassification latestTrash={latestTrash} isLoading={isLoading}/>
+            <br/>
             {/* Daily Summary Panel */}
-            <div className="mb-8">
-                <DailySummary trashHistory={trashHistory} />
-            </div>
-
+            <DailySummary trashHistory={trashHistory}/>
+            <br/>
             <Card className="mb-8 shadow-md">
                 <CardContent className="py-6">
                     <p className="text-center text-base text-gray-700">
@@ -146,11 +140,11 @@ export default function DashboardPage() {
 
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {bins.map(bin => (
-                    <TrashBinCard key={bin.id} bin={bin} />
+                    <TrashBinCard key={bin.id} bin={bin}/>
                 ))}
             </div>
 
-            <br />
+            <br/>
 
             <Card className="mx-auto max-w-lg mb-4 shadow-sm">
                 <CardHeader>
@@ -166,7 +160,7 @@ export default function DashboardPage() {
                     </button>
                     <span
                         className="inline-block text-green-600 animate-spin"
-                        style={{ animationDuration: '2s' }}
+                        style={{animationDuration: '2s'}}
                         role="img"
                         aria-label="Recycle"
                     >

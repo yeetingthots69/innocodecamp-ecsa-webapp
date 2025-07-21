@@ -2,13 +2,7 @@
   {
     "id": "bin1",
     "name": "Library Bin",
-    "height": 29,
-    "width": 16
-  },
-  {
-    "id": "bin3",
-    "name": "a",
-    "height": 111,
-    "width": 123
+    "height": 22,
+    "width": 17
   }
 ]

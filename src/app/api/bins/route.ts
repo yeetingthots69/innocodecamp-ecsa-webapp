@@ -6,7 +6,7 @@ import { readFile, writeFile } from 'fs/promises';
 const binFilePath = path.join(process.cwd(), 'src', 'data', 'bins.json');
 
 export async function GET() {
-    const response = await fetch('http://localhost:3000/bins');
+    const response = await fetch('http://localhost:3001/bins');
     const data = await response.json();
     return NextResponse.json(data);
 }

@@ -1,8 +1,7 @@
 import { TrashData } from "@/types/trash";
 import path from "path";
 import { existsSync } from "fs";
-import { mkdir, readFile, writeFile } from "fs/promises"
-import { timeStamp } from "console";
+import { mkdir, readFile, writeFile, readdir } from "fs/promises"
 
 // Input data interface
 interface HuggingFaceInput {
@@ -208,22 +207,21 @@ async function saveTrashData(trashData: TrashData): Promise<void> {
 
 export async function POST(request: Request) {
     try {
-        const formData = await request.formData();
-        const file = formData.get('image') as File;
-
-        if (!file) {
+        const { filename } = await request.json();
+        if (!filename) {
             return Response.json(
-                { error: 'No file provided' },
+                { error: 'No filename provided' },
                 { status: 400 }
             );
         }
 
-        if (!file.type.startsWith('image/')) {
-            return Response.json(
-                { error: 'file must be an image' },
-                { status: 400 }
-            );
-        }
+        const filePath = path.join(process.cwd(), 'Camera', filename);
+
+        // Read file as Buffer
+        const fileBuffer = await readFile(filePath);
+
+        // Create a File-like object for classifyGarbage
+        const file = new File([fileBuffer], filename, { type: 'image/jpeg' });
 
         const results = await classifyGarbage(file);
         const topResult = results[0];
@@ -234,7 +232,8 @@ export async function POST(request: Request) {
             timestamp: new Date().toISOString(),
             confidence: topResult.score,
             recyclingInfo: recyclingInfo,
-        }
+        };
+        console.log(trashData);
 
         try {
             await saveTrashData(trashData);
@@ -243,15 +242,15 @@ export async function POST(request: Request) {
         }
 
         return Response.json({
-            success: true,
-            data: {
+            // success: true,
+            // data: {
                 category: topResult.label,
                 confidence: topResult.score,
                 allResult: results,
                 recyclingInfo: recyclingInfo,
-                saveToFile: true,
+                // saveToFile: true,
                 timestamp: trashData.timestamp
-            }
+            // }
         });
     } catch (error) {
         console.error('API error: ', error);
@@ -287,6 +286,51 @@ export async function GET() {
         console.error('Error reading trash data:', error);
         return Response.json(
             { error: 'Failed to read trash data' },
+            { status: 500 }
+        );
+    }
+}
+
+export async function DELETE(request: Request) {
+    try {
+        const { timestamp } = await request.json();
+        if (!timestamp) {
+            return Response.json(
+                { error: 'No timestamp provided' },
+                { status: 400 }
+            );
+        }
+
+        const dataDir = path.join(process.cwd(), 'src', 'data');
+        const filePath = path.join(dataDir, 'trash.json');
+
+        // Check if file exists
+        if (!existsSync(filePath)) {
+            return Response.json(
+                { error: 'No trash data found' },
+                { status: 404 }
+            );
+        }
+
+        // Read the file
+        const fileContent = await readFile(filePath, 'utf-8');
+        let data: TrashData[] = JSON.parse(fileContent);
+
+        // Filter out the entry with the given timestamp
+        data = data.filter(entry => entry.timestamp !== timestamp);
+
+        // Write the updated data back to the file
+        await writeFile(filePath, JSON.stringify(data, null, 2));
+
+        return Response.json({
+            success: true,
+            message: 'Trash entry deleted successfully'
+        });
+
+    } catch (error) {
+        console.error('Error deleting trash entry:', error);
+        return Response.json(
+            { error: 'Failed to delete trash entry' },
             { status: 500 }
         );
     }
